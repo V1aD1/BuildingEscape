@@ -32,4 +32,7 @@ private:
 	
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 	UInputComponent* InputComponent = nullptr;
+	
+	//ray cast and grab what's in rach
+	void Grab();
 };

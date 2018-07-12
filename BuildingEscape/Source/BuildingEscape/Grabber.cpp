@@ -40,6 +40,7 @@ void UGrabber::BeginPlay()
 	}
 
 	if (InputComponent) {
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 	}
 
 	else {
@@ -83,5 +84,10 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 		UE_LOG(LogTemp, Warning, TEXT("View Point ray cast is colliding with %s"), *(actorHit->GetName()))
 	}
+}
+
+void UGrabber::Grab()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"))
 }
 
