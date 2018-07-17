@@ -35,4 +35,14 @@ private:
 	
 	//ray cast and grab what's in rach
 	void Grab();
+
+	void Release();
+
+	void FindPhysicsHandleComponent();
+
+	//setup assumed attached input component
+	void SetupInputComponent();
+
+	//return hit for first physics body in reach
+	const FHitResult GetFirstPhysicsBodyInReach();
 };
