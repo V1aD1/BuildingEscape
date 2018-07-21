@@ -15,7 +15,6 @@ UOpenDoor::UOpenDoor()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 // Called when the game starts
 void UOpenDoor::BeginPlay()
 {
@@ -27,21 +26,6 @@ void UOpenDoor::BeginPlay()
 	}
 }
 
-void UOpenDoor::OpenDoor()
-{
-	if (!Owner) { return; }
-	//Open the door
-	//Owner->SetActorRotation(FRotator(0.0f, OpenAngle, 00.0f));
-	OnOpenRequest.Broadcast();
-}
-
-void UOpenDoor::CloseDoor()
-{
-	if (!Owner) { return; }
-	//Close the door
-	Owner->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
-}
-
 
 // Called every frame
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -49,15 +33,13 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	//Poll trigger volume
-	if (GetTotalMassOfActorsOnPlate() > 30.f) //todo remove hardcoded 50
+	if (GetTotalMassOfActorsOnPlate() > TriggerMass) //todo remove hardcoded 50
 	{
-		OpenDoor();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		OnOpen.Broadcast();
 	}
 
-	//check if it's time to close the door
-	if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime >= DoorCloseDelay) {
-		CloseDoor();
+	else {
+		OnClose.Broadcast();
 	}
 }
 
@@ -69,7 +51,6 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 	TArray<AActor*> OverLappingActors;
 	if (!PressurePlate) { return TotalMass; }
 	PressurePlate->GetOverlappingActors(OUT OverLappingActors);
-
 
 	//iterate through them and calculate their mass
 	for (const auto& Actor : OverLappingActors) {
