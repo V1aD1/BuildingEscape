@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
 #include "Classes/Components/PrimitiveComponent.h"
+#include "Classes/Kismet/GameplayStatics.h"
 
 #define OUT
 
@@ -18,11 +19,17 @@ UOpenDoor::UOpenDoor()
 // Called when the game starts
 void UOpenDoor::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 	Owner = GetOwner();
+	Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
 	if (!PressurePlate) {
 		UE_LOG(LogTemp, Error, TEXT("%s missing pressure plate!!"), *GetOwner()->GetName());
+	}
+
+	if (TriggeringActors.Num() == 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s missing triggering actors for pressure plate!!"), *GetOwner()->GetName());
 	}
 }
 
@@ -33,7 +40,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	//Poll trigger volume
-	if (GetTotalMassOfActorsOnPlate() > TriggerMass) //todo remove hardcoded 50
+	if (IsTriggeringActorOnPlate()) //todo remove hardcoded 50
 	{
 		OnOpen.Broadcast();
 	}
@@ -43,20 +50,25 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	}
 }
 
-float UOpenDoor::GetTotalMassOfActorsOnPlate()
+//Returns true if a triggering actor (which ALWAYS includes the player actor)
+//are on the pressure plate
+bool UOpenDoor::IsTriggeringActorOnPlate()
 {
-	float TotalMass = 0.f;
-
-	//find all overlapping actors
 	TArray<AActor*> OverLappingActors;
-	if (!PressurePlate) { return TotalMass; }
+
+	if (!PressurePlate) { return false; }
+	if (TriggeringActors.Num() == 0) { return false; }
+
 	PressurePlate->GetOverlappingActors(OUT OverLappingActors);
 
 	//iterate through them and calculate their mass
 	for (const auto& Actor : OverLappingActors) {
-		TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+		if (Actor == Player) { return true; }
+		for (const auto& TriggeringActor : TriggeringActors) {
+			if (Actor == TriggeringActor) { return true; }
+		}
 	}
 
-	return TotalMass;
+	return false;
 }
 

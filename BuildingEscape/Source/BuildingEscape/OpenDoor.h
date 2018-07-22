@@ -35,10 +35,11 @@ private:
 	ATriggerVolume* PressurePlate = nullptr; 
 
 	UPROPERTY(EditAnywhere)
-	float TriggerMass = 30.f;
+	TArray<AActor*> TriggeringActors = {};
 
 	AActor* Owner = nullptr;
+	AActor* Player = nullptr;
 
 	//returns total mass in kg
-	float GetTotalMassOfActorsOnPlate();
+	bool IsTriggeringActorOnPlate();
 };
