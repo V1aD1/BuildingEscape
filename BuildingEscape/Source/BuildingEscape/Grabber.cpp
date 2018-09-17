@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "GameFramework/PlayerController.h"
 #include "Classes/Components/PrimitiveComponent.h"
 
 #define OUT
@@ -73,7 +74,7 @@ void UGrabber::Grab()
 	//if we hit something then attach a physics handle
 	if (!PhysicsHandle) { return; }
 	if (ActorHit) {
-		PhysicsHandle->GrabComponent(ComponentToGrab, NAME_None, ComponentToGrab->GetOwner()->GetActorLocation(), true);
+		PhysicsHandle->GrabComponentAtLocation(ComponentToGrab, NAME_None, ComponentToGrab->GetOwner()->GetActorLocation());
 	}
 }
 
